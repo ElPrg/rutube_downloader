@@ -357,12 +357,28 @@ class Rutube:
     def _get_title(self):
         return self._clean_title(self._data.get('title')) or self._video_id
 
-    @staticmethod
+  @staticmethod
     def _clean_title(title):
         if not title:
             return title
-
-        return ''.join(filter(lambda x: x not in FORBIDDEN_CHARS, title))
+        
+        # Удаляем управляющие символы (включая \n, \r, \t)
+        import re
+        title = re.sub(r'[\x00-\x1f\x7f]', '', title)
+        
+        # Заменяем обратные слеши на пробелы
+        title = title.replace('\\', ' ')
+        
+        # Удаляем запрещенные символы
+        title = ''.join(filter(lambda x: x not in FORBIDDEN_CHARS, title))
+        
+        # Убираем множественные пробелы
+        title = re.sub(r'\s+', ' ', title)
+        
+        # Убираем пробелы в начале и конце
+        title = title.strip()
+        
+        return title
 
     @property
     def playlist(self):
